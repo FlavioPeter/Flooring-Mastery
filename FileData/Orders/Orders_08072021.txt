@@ -1,0 +1,2 @@
+OrderNumber::CustomerName::State::TaxRate::ProductType::Area::CostPerSquareFoot::LaborCostPerSquareFoot::MaterialCost::LaborCost::Tax::Total::Date
+0::qw::CA::25.00::Tile::111::3.50::4.15::388.50::460.65::212.29::1061.44::2021-08-07

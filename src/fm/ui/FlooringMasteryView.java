@@ -5,6 +5,9 @@ package fm.ui;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,21 +35,29 @@ public class FlooringMasteryView {
 		io.println("2. Look for an order");
 		io.println("3. Add an order");
 		io.println("4. Remove an order");
-		io.println("5. Exit");
+		io.println("5. Export all orders data.");
+		io.println("6. Exit");
 		
 		return io.readInt("Please, select from the menu above: ");
 	}
 	
-	public Order getNewOrderInfo() {
-		int orderNumber = io.readInt("Please, enter order ID: "); // 1 //Should be assigned automatically
+	public Order getNewOrderInfo(String[] productTypesMenu, String[][] statesMenu) {
+		
+		Order newOrder = new Order(0); // 1 instatiate with 0 for now, and re-assign once it passes validation
+		
+		LocalDate orderDate = io.readLocalDate("For when is the order? (e.g: mm-dd-yyyy): ", DateTimeFormatter.ofPattern("MM-dd-yyyy"));
+		
 		String customerName = io.readString("Please enter the customer's name: "); // 2
 		
 		// View stateAbbrevs available
+		for(int i = 0; i<statesMenu[0].length; i++) {
+			io.println(statesMenu[0][i]+" : "+statesMenu[1][i]);
+		}
 		String stateAbbrev = io.readString("Please, enter the state abbreviation: "); // 3
 		
 		// 4 determine taxRate in service in function of stateAbbrev
 		
-		// View productTypes available
+		Arrays.stream(productTypesMenu).forEach((p) -> {io.println(p);});// View productTypes available
 		String productType = io.readString("Please, enter product type: "); // 5
 		
 		BigDecimal area = io.readBigDecimal("Please inser area in ft^2: ", 2, RoundingMode.HALF_UP); // 6
@@ -61,7 +72,7 @@ public class FlooringMasteryView {
 		// 12 total of totals, let service layer calculate and set
 		
 		// Set values taken
-		Order newOrder = new Order(orderNumber); // 1
+		newOrder.setOrderDate(orderDate);//13
 		newOrder.setCustomerName(customerName); // 2
 		newOrder.setStateAbbrev(stateAbbrev); // 3
 		newOrder.setProductType(productType); // 5
@@ -74,8 +85,12 @@ public class FlooringMasteryView {
 		io.println("=== CREATE NEW ORDER ===");
 	}
 	
-	public void displayCreateSuccessBanner(int orderNumber) {
-		io.readString("Order "+orderNumber+" created with success. Please hit enter to continue...");
+	public void displayCreateSuccessBanner(int orderNumber,Order successOrder) {
+		if(successOrder==null) {
+			io.readString("Order "+orderNumber+" created with success. Please hit enter to continue...");
+		}else {
+			io.readString("Order "+orderNumber+" was overwritten. Please hit enter to continue...");
+		}
 	}
 	
 	private void orderDisplayer(Order currentOrder) { // used in displayOrderList and displayOrder
@@ -125,7 +140,7 @@ public class FlooringMasteryView {
 	}
 	
 	public void displayRemoveOrderBanner() {
-		io.println("=== REMOVE STUDENT ===");
+		io.println("=== DELETE ORDER ===");
 	}
 	
 	public void displayRemoveResult(Order removedOrder) {
@@ -152,5 +167,17 @@ public class FlooringMasteryView {
 		io.println("=== ERROR ===");
 		io.print(errorMsg);
 	}
+
+	public void displayExportAllDataBanner() {
+		io.println("=== Export All Data ===");
+	}
+
+	public void displayExportSuccess() {
+		io.println("All data was exported with success.");
+		io.readString("Press enter to continue...");
+	}
 	
+	public LocalDate getDateSpecification() {
+		return io.readLocalDate("Which date? (e.g: mm-dd-yyyy): ", DateTimeFormatter.ofPattern("MM-dd-yyyy"));
+	}
 }

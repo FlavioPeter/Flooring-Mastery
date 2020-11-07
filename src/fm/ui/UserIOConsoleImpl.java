@@ -5,6 +5,8 @@ package fm.ui;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 import org.springframework.stereotype.Component;
@@ -50,6 +52,13 @@ public class UserIOConsoleImpl implements UserIO {
 		BigDecimal ans = new BigDecimal(scanner.nextLine());
 		ans.setScale(decimals, roundingMode);
 		println("");
+		return ans;
+	}
+	
+	@Override
+	public LocalDate readLocalDate(String prompt, DateTimeFormatter format) {
+		print(prompt);
+		LocalDate ans = LocalDate.parse(scanner.nextLine(), format);
 		return ans;
 	}
 }

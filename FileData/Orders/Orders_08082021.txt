@@ -1,0 +1,2 @@
+OrderNumber::CustomerName::State::TaxRate::ProductType::Area::CostPerSquareFoot::LaborCostPerSquareFoot::MaterialCost::LaborCost::Tax::Total::Date
+0::fl::WA::9.25::Tile::23::3.50::4.15::80.50::95.45::16.28::192.23::2021-08-08

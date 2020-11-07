@@ -4,6 +4,7 @@
 package fm.dao;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 import fm.dto.Order;
@@ -28,7 +29,7 @@ public interface FlooringMasteryDao {
 	 * 
 	 * 
 	 */
-	List<Order> getAllOrders() throws FlooringMasteryPersistenceException;
+	List<Order> getAllOrders(LocalDate orderDate) throws FlooringMasteryPersistenceException;
 	
 	List<Product> getAllProducts() throws FlooringMasteryPersistenceException;
 	
@@ -39,13 +40,15 @@ public interface FlooringMasteryDao {
 	 * 
 	 * 
 	 */
-	Order getOrder(int orderNumber) throws FlooringMasteryPersistenceException;
+	Order getOrder(int orderNumber, LocalDate orderDate) throws FlooringMasteryPersistenceException;
 	
 	/**
 	 * Removes order associated with a given id
 	 * Returns Order being removed or null if it doesn't exist
 	 * 
 	 */
-	Order removeOrder(int orderNumber) throws FlooringMasteryPersistenceException, IOException;	
+	Order removeOrder(int orderNumber, LocalDate orderDate) throws FlooringMasteryPersistenceException, IOException;
+
+	List<Order> exportAllOrders();	
 	
 }

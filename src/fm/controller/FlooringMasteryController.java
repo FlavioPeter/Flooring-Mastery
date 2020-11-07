@@ -4,6 +4,7 @@
 package fm.controller;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import fm.dao.FlooringMasteryPersistenceException;
 import fm.dto.Order;
@@ -43,18 +44,21 @@ public class FlooringMasteryController {
 				
 				switch(menuSelection) {
 					case 1:
-						listOrders();
+						listOrders();// add pick a date functionality and make sure it unmarshalls that date
 						break;
 					case 2:
-						lookOrder();
+						lookOrder();// add pick a date functionality and make sure it unmarshalls that date
 						break;
 					case 3:
-						createNewOrder();
+						createNewOrder(); // add pick a date functionality and make sure it unmarshalls and marshalls that date
 						break;
 					case 4:
-						removeOrder();
+						removeOrder(); // add pick a date functionality and make sure it unmarshalls and marshalls that date
 						break;
 					case 5:
+						exportAllData(); // Unmarshalls all order dates and marshalls to one file
+						break;
+					case 6:
 						keepGoing = false;
 						break;
 					default:
@@ -66,7 +70,7 @@ public class FlooringMasteryController {
 			view.displayErrorMessage(e.getMessage());
 		}
 	}
-	
+
 	private int getMenuSelection() {
 		return view.printMenuAndGetSelection();
 	}
@@ -76,9 +80,11 @@ public class FlooringMasteryController {
 		boolean hasErrors = false;
 		do {
 			try {
-				Order newOrder = view.getNewOrderInfo();
-				service.createNewOrder(newOrder);
-				view.displayCreateSuccessBanner(newOrder.getOrderNumber());
+				String[] productTypesMenu = service.getProductTypes();
+				String[][] statesMenu = service.getStates();
+				Order newOrder = view.getNewOrderInfo(productTypesMenu, statesMenu);
+				Order successOrder= service.createNewOrder(newOrder);
+				view.displayCreateSuccessBanner(newOrder.getOrderNumber(), successOrder);
 			}catch(FlooringMasteryDataValidationException e) {
 				hasErrors = true;
 				view.displayErrorMessage(e.getMessage());
@@ -88,22 +94,32 @@ public class FlooringMasteryController {
 	
 	private void listOrders() throws FlooringMasteryPersistenceException {
 		view.displayListAllOrdersBanner();
-		List<Order> orderList = service.getAllOrders();
+		LocalDate orderDate = view.getDateSpecification();
+		List<Order> orderList = service.getAllOrders(orderDate);
 		view.displayOrderList(orderList);
 	}
 	
 	private void lookOrder() throws FlooringMasteryPersistenceException {
 		view.displayOrderBanner();
+		LocalDate orderDate = view.getDateSpecification();
 		int orderNumber = view.getOrderNumberChoice();
-		Order currentOrder = service.getOrder(orderNumber);
+		Order currentOrder = service.getOrder(orderNumber, orderDate);
 		view.displayOrder(currentOrder);
 	}
 	
 	private void removeOrder() throws FlooringMasteryPersistenceException, IOException {
 		view.displayRemoveOrderBanner();
+		LocalDate orderDate = view.getDateSpecification();
 		int orderNumber = view.getOrderNumberChoice();
-		Order removedOrder = service.removeOrder(orderNumber);
+		Order removedOrder = service.removeOrder(orderNumber, orderDate);
 		view.displayRemoveResult(removedOrder);
+	}
+	
+	private void exportAllData() {
+		view.displayExportAllDataBanner();
+		service.exportAllData();
+		view.displayExportSuccess();
+		
 	}
 	
 	private void unknownCommand(int menuSelection) {

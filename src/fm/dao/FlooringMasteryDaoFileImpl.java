@@ -4,6 +4,7 @@
 package fm.dao;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -11,7 +12,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,18 +34,11 @@ import fm.dto.Tax;
 
 @Component
 public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
-
-	//@Autowired
-	public FlooringMasteryDaoFileImpl(){
-		
-		LocalDate date = LocalDate.now();
-		this.ORDER_FILE = "orders_"+date.getYear()+date.getMonth()+date.getDayOfWeek()+".txt";
-	}
 	
-	public final String ORDER_FILE;
-	public final String PRODUCT_FILE = "Products.txt";
-	public final String TAX_FILE = "Taxes.txt";
-	public static final String DELIMITER = "::";
+	private String ORDER_FILE;
+	private static final String PRODUCT_FILE = "Products.txt";
+	private static final String TAX_FILE = "Taxes.txt";
+	private static final String DELIMITER = "::";
 	
 	private Map<Integer, Order> orders = new HashMap<>();
 	private Map<String, Product> products = new HashMap<>();
@@ -50,15 +46,20 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 	
 	@Override
 	public Order addOrder(int orderNumber, Order order) throws FlooringMasteryPersistenceException, IOException {
-		loadOrder();loadProduct();loadTax();
+		String orderFileName = orderFileNameSyntax(order.getOrderDate());
+		boolean doesTheFileExist = checkIfFileForThatDateExists(orderFileName);
+		if(doesTheFileExist) {
+			loadOrder(orderFileName);loadProduct();loadTax();// maybe not necessary the other loads
+		}
 		Order newOrder = orders.put(orderNumber, order);
-		writeOrder(orders);
+		writeOrder(orders, orderFileName);
 		return newOrder;
 	}
 	
 	@Override
-	public List<Order> getAllOrders() throws FlooringMasteryPersistenceException{
-		loadOrder();
+	public List<Order> getAllOrders(LocalDate orderDate) throws FlooringMasteryPersistenceException{
+		String orderFileName = orderFileNameSyntax(orderDate);
+		loadOrder(orderFileName);
 		return new ArrayList<Order>(orders.values());
 	}
 	
@@ -75,21 +76,33 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 	}
 	
 	@Override
-	public Order getOrder(int orderNumber) throws FlooringMasteryPersistenceException {
-		loadOrder();
+	public Order getOrder(int orderNumber, LocalDate orderDate) throws FlooringMasteryPersistenceException {
+		String orderFileName = orderFileNameSyntax(orderDate);
+		loadOrder(orderFileName);
 		return orders.get(orderNumber);
 	}
 	
 	@Override
-	public Order removeOrder(int orderNumber) throws FlooringMasteryPersistenceException, IOException {
-		loadOrder();
+	public Order removeOrder(int orderNumber, LocalDate orderDate) throws FlooringMasteryPersistenceException, IOException {
+		String orderFileName = orderFileNameSyntax(orderDate);
+		loadOrder(orderFileName);
 		Order removedOrder = orders.remove(orderNumber);
-		writeOrder(orders);
+		writeOrder(orders, orderFileName);
 		return removedOrder;
+	}
+	@Override
+	public List<Order> exportAllOrders() throws FlooringMasteryPersistenceException{
+		File direct = new File("FileData/Orders/");
+		
+		File[] fileArr = direct.listFiles();
+		
+		for(File file : fileArr) {
+			loadOrder(file.getPath());
+		}
 	}
 	
 	private Order unmarshallOrder(String orderAsText) {
-		//<OrderNumber>::<CustomerName>::<StateAbbrev>::<TaxRate>::<ProductType>::<Area>::<CostPerSquareFoot>::<LaborCostPerSquareFoot>::<MaterialCost>::<LaborCost>::<Tax>::<Total>
+		//<OrderNumber>::<CustomerName>::<StateAbbrev>::<TaxRate>::<ProductType>::<Area>::<CostPerSquareFoot>::<LaborCostPerSquareFoot>::<MaterialCost>::<LaborCost>::<Tax>::<Total>::<OrderDate>
 		//     [0]            [1]             [2]          [3]          [4]        [5]           [6]                     [7]                   [8]           [9]       [10]   [11]
 		
 		String[] orderTokens = orderAsText.split(DELIMITER);
@@ -119,6 +132,8 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 		orderFromFile.setTax(new BigDecimal(orderTokens[10]));//[10]
 		
 		orderFromFile.setTotal(new BigDecimal(orderTokens[11]));//[11]
+		
+		orderFromFile.setOrderDate(LocalDate.parse(orderTokens[12]));//[12]
 		
 		return orderFromFile;
 	}
@@ -157,7 +172,17 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 		return taxFromFile;
 	}
 	
-	private void loadOrder() throws FlooringMasteryPersistenceException{
+	private void loadOrder(String orderFileName) throws FlooringMasteryPersistenceException{
+		
+		File file;
+		
+		// Check if the path is ready. If it is, then just assign it to ORDER_FILE
+		if(orderFileName.contains("\'")) { // check if this logic actually works
+			ORDER_FILE = orderFileName;
+		}else {
+			file = new File("FileData/Orders/"+orderFileName);
+			ORDER_FILE = file.getPath();
+		}
 		
 		Scanner scanner;
 		
@@ -182,6 +207,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 			orders.put(currentOrder.getOrderNumber(), currentOrder);
 		}
 		scanner.close();
+		
 	}
 	
 	private void loadProduct() throws FlooringMasteryPersistenceException{
@@ -189,7 +215,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 		Scanner scanner;
 		
 		try {
-			scanner = new Scanner(new BufferedReader(new FileReader(PRODUCT_FILE)));
+			scanner = new Scanner(new BufferedReader(new FileReader("FileData/Data/"+PRODUCT_FILE)));
 		}catch(FileNotFoundException e) {
 			throw new FlooringMasteryPersistenceException("-_- Could not load product data into memory.",e);
 		}
@@ -216,7 +242,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 		Scanner scanner;
 		
 		try {
-			scanner = new Scanner(new BufferedReader(new FileReader(TAX_FILE)));
+			scanner = new Scanner(new BufferedReader(new FileReader("FileData/Data/"+TAX_FILE)));
 		}catch(FileNotFoundException e) {
 			throw new FlooringMasteryPersistenceException("-_- Could not load tax data into memory.",e);
 		}
@@ -276,22 +302,45 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 		
 		orderAsText += aOrder.getTax()+DELIMITER;//10
 		
-		orderAsText += aOrder.getTotal();//11
+		orderAsText += aOrder.getTotal()+DELIMITER;//11
+		
+		orderAsText += aOrder.getOrderDate();//12
 		
 		return orderAsText;
 	}
 	
-	private void writeOrder(Map <Integer,Order> orders) throws FlooringMasteryPersistenceException, IOException {
-        PrintWriter scanner;
+	private void writeOrder(Map <Integer,Order> orders, String orderFileName) throws FlooringMasteryPersistenceException, IOException {
+        
+		File file = new File("FileData/Orders/"+orderFileName);
+		
+		ORDER_FILE = file.getPath();
+		
+		PrintWriter scanner;
         try {
             scanner = new PrintWriter(new FileWriter(ORDER_FILE));
         } catch (FileNotFoundException e) {
             throw new FlooringMasteryPersistenceException( "-_- Could not write orders into memory.", e);
         }
         
+        file.createNewFile();
+        scanner.println("OrderNumber::CustomerName::State::TaxRate::ProductType::Area::CostPerSquareFoot::LaborCostPerSquareFoot::MaterialCost::LaborCost::Tax::Total::Date");
         for(Entry<Integer, Order> thisOrder: orders.entrySet()){
             scanner.println(marshallOrder(thisOrder.getValue()));
         }
         scanner.close();
     }
+	
+	private String orderFileNameSyntax(LocalDate orderDate) {
+		return "Orders_"+orderDate.format(DateTimeFormatter.ofPattern("MMddyyyy"))+".txt";
+	}
+	
+	private boolean checkIfFileForThatDateExists(String orderFileName) {
+		File file = new File("FileData/Orders/");
+		
+		File[] fileArr = file.listFiles();
+		
+		return Arrays.stream(fileArr).map((f) -> f.getPath()).anyMatch((f) -> f.contains(orderFileName));
+	}
+	
+	
 }

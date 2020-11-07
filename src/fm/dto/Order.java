@@ -4,6 +4,7 @@
 package fm.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 /**
  * @author Flavio Silva
@@ -23,6 +24,8 @@ public class Order {
 	private BigDecimal laborCost; // total labor cost
 	private BigDecimal tax; // total tax
 	private BigDecimal total; // total of totals
+	
+	LocalDate orderDate;
 	
 	public Order(int orderNumber) { // 1
 		this.orderNumber = orderNumber;
@@ -118,6 +121,14 @@ public class Order {
 	
 	public BigDecimal getTotal() { // 12
 		return total;
+	}
+	
+	public void setOrderDate(LocalDate orderDate) {
+		this.orderDate = orderDate;
+	}
+	
+	public LocalDate getOrderDate() {
+		return orderDate;
 	}
 	
 }

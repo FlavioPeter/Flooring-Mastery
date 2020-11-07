@@ -6,6 +6,8 @@ package fm.service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,7 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 	}
 	
 	@Override
-	public void createNewOrder(Order order)
+	public Order createNewOrder(Order order)
 			throws FlooringMasteryDataValidationException, FlooringMasteryPersistenceException, IOException {
 		//maybe check if the order number already exists
 		
@@ -42,7 +44,7 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 		
 		setCalculatedFields(order);
 		
-		dao.addOrder(order.getOrderNumber(), order);
+		return dao.addOrder(order.getOrderNumber(), order);
 		
 	}
 
@@ -86,8 +88,8 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 	}
 
 	@Override
-	public List<Order> getAllOrders() throws FlooringMasteryPersistenceException {
-		return dao.getAllOrders();
+	public List<Order> getAllOrders(LocalDate orderDate) throws FlooringMasteryPersistenceException {
+		return dao.getAllOrders(orderDate);
 	}
 	
 	@Override
@@ -101,13 +103,13 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 	}
 
 	@Override
-	public Order getOrder(int orderNumber) throws FlooringMasteryPersistenceException {
-		return dao.getOrder(orderNumber);
+	public Order getOrder(int orderNumber, LocalDate orderDate) throws FlooringMasteryPersistenceException {
+		return dao.getOrder(orderNumber, orderDate);
 	}
 
 	@Override
-	public Order removeOrder(int orderNumber) throws FlooringMasteryPersistenceException, IOException {
-		return dao.removeOrder(orderNumber);
+	public Order removeOrder(int orderNumber, LocalDate orderDate) throws FlooringMasteryPersistenceException, IOException {
+		return dao.removeOrder(orderNumber, orderDate);
 	}
 	
 	private void validateOrderData(Order order) throws FlooringMasteryDataValidationException, FlooringMasteryPersistenceException {
@@ -122,18 +124,33 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 		}
 		
 		// Checking for valid state abbreviation
-		boolean validStateAbbreviation = getAllTaxes().stream().map((t) -> t.getStateAbbreviation()).anyMatch(order.getStateAbbrev()::equals);
+		boolean validStateAbbreviation = Arrays.stream(getStates()[0]).anyMatch(order.getStateAbbrev()::equals);
 		if(validStateAbbreviation==false) {
 			throw new FlooringMasteryDataValidationException("ERROR: There was an invalid state abbreviation");
 		}
 		
 		// Checking for valid product type
-		boolean validProductType = getAllProducts().stream().map((p) -> p.getProductType()).anyMatch(order.getProductType()::equals);
+		boolean validProductType = Arrays.stream(getProductTypes()).anyMatch(order.getProductType()::equals);
 		if(validProductType==false) {
 			throw new FlooringMasteryDataValidationException("ERROR: There was an invalid product type.");
 		}
 	}
 	
+	@Override
+	public String[] getProductTypes() throws FlooringMasteryPersistenceException {
+		return getAllProducts().stream().map((p) -> p.getProductType()).toArray(String[]::new);
+	}
 	
+	@Override
+	public String[][] getStates() throws FlooringMasteryPersistenceException {
+		String[] abbreviations = getAllTaxes().stream().map((t) -> t.getStateAbbreviation()).toArray(String[]::new);
+		String[] states = getAllTaxes().stream().map((t) -> t.getStateName()).toArray(String[]::new);
+		String[][] combined = {abbreviations, states};
+		return combined;
+	}
+	
+	public List<Order> exportAllOrders(){
+		return dao.exportAllOrders();
+	}
 	
 }
