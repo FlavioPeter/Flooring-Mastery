@@ -1,4 +1,8 @@
-OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total,OrderDate
-1,Ada Lovelace,CA,25.00,Tile,249.00,3.50,4.15,871.50,1033.35,476.21,2381.06,06-01-2013
-2,Doctor Who,WA,9.25,Wood,243.00,5.15,4.75,1251.45,1154.25,216.51,2622.21,06-02-2013
-3,Albert Einstein,KY,6.00,Carpet,217.00,2.25,2.10,488.25,455.70,56.64,1000.59,06-02-2013
+OrderNumber::CustomerName::State::TaxRate::ProductType::Area::CostPerSquareFoot::LaborCostPerSquareFoot::MaterialCost::LaborCost::Tax::Total::Date
+1::Ada Lovelace::CA::25.00::Tile::249.00::3.50::4.15::871.50::1033.35::476.21::2381.06::06-01-2013
+2::Doctor Who::WA::9.25::Wood::243.00::5.15::4.75::1251.45::1154.25::216.51::2622.21::06-02-2013
+3::Albert Einstein::KY::6.00::Carpet::217.00::2.25::2.10::488.25::455.70::56.64::1000.59::06-02-2013
+1::qwe::WA::9.25::Carpet::1.999999::2.25::2.10::4.50::4.20::0.80::9.50::08-07-2021
+1::fla::KY::6.00::Tile::2.24::3.50::4.15::7.84::9.30::1.03::18.17::08-08-2021
+3::qinn::CA::25.00::Tile::4.567::3.50::4.15::15.98::18.95::8.73::43.66::08-08-2021
+4::qw::TX::4.45::Wood::9.999::5.15::4.75::51.49::47.50::4.41::103.40::08-08-2021

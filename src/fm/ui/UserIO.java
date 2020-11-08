@@ -26,4 +26,6 @@ public interface UserIO { // Here we need to be able to handle String, Integer a
 	
 	LocalDate readLocalDate(String prompt, DateTimeFormatter format);
 	
+	boolean readBoolean(String prompt, String trueString);
+	
 }

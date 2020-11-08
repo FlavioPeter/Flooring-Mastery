@@ -1,2 +1,4 @@
 OrderNumber::CustomerName::State::TaxRate::ProductType::Area::CostPerSquareFoot::LaborCostPerSquareFoot::MaterialCost::LaborCost::Tax::Total::Date
-0::fl::WA::9.25::Tile::23::3.50::4.15::80.50::95.45::16.28::192.23::2021-08-08
+1::fla::KY::6.00::Tile::2.24::3.50::4.15::7.84::9.30::1.03::18.17::08-08-2021
+3::qinn::CA::25.00::Tile::4.567::3.50::4.15::15.98::18.95::8.73::43.66::08-08-2021
+4::qw::TX::4.45::Wood::9.999::5.15::4.75::51.49::47.50::4.41::103.40::08-08-2021

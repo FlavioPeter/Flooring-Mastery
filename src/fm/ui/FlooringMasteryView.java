@@ -30,14 +30,16 @@ public class FlooringMasteryView {
 	}
 	
 	public int printMenuAndGetSelection(){
-		io.println("Main Menu");
-		io.println("1. List Orders");
-		io.println("2. Look for an order");
-		io.println("3. Add an order");
-		io.println("4. Remove an order");
-		io.println("5. Export all orders data.");
-		io.println("6. Exit");
-		
+		io.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
+		io.println("* <<Flooring Program>>");
+		io.println("* 1. List Orders");
+		io.println("* 2. Look for an order");
+		io.println("* 3. Add an order");
+		io.println("* 4. Modify an order");
+		io.println("* 5. Remove an order");
+		io.println("* 6. Export all orders data.");
+		io.println("* 7. Exit");
+		io.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
 		return io.readInt("Please, select from the menu above: ");
 	}
 	
@@ -94,7 +96,7 @@ public class FlooringMasteryView {
 	}
 	
 	private void orderDisplayer(Order currentOrder) { // used in displayOrderList and displayOrder
-		String orderInfo = String.format("#%s : %s :: %s :: %s :: %s :: %s :: %s :: %s :: %s :: %s :: %s :: %s",
+		String orderInfo = String.format("#%s : %s :: %s :: %s %% :: %s :: %s ft^2 :: $ %s :: $ %s :: $ %s :: $ %s :: $ %s :: $ %s",
 				String.valueOf(currentOrder.getOrderNumber()),//1
 				currentOrder.getCustomerName(),//2
 				currentOrder.getStateAbbrev(),//3
@@ -112,6 +114,7 @@ public class FlooringMasteryView {
 	}
 	
 	public void displayOrderList(List<Order> orderList) {
+		io.println("#OrderNumber:CustomerName::State::TaxRate::ProductType::Area::CostPerSquareFoot::LaborCostPerSquareFoot::MaterialCost::LaborCost::Tax::Total");
 		for(Order currentOrder : orderList) {
 			orderDisplayer(currentOrder);
 		}
@@ -137,6 +140,10 @@ public class FlooringMasteryView {
 			io.print("No order with this number.");
 		}
 		io.readString("Please hit enter to continue...");
+	}
+	
+	public void displayModifyOrderBanner() {
+		io.println("=== MODIFY ORDER DATA ===");
 	}
 	
 	public void displayRemoveOrderBanner() {
@@ -179,5 +186,54 @@ public class FlooringMasteryView {
 	
 	public LocalDate getDateSpecification() {
 		return io.readLocalDate("Which date? (e.g: mm-dd-yyyy): ", DateTimeFormatter.ofPattern("MM-dd-yyyy"));
+	}
+
+	public boolean updateData() {
+		return io.readBoolean("Save modified order? (Y/N)", "Y");
+	}
+
+	public void notUpdateDataMessage() {
+		io.println("The data was not updated.");
+	}
+
+	public void getModifiedOrderInfo(Order orderToModify, String[] productTypesMenu, String[][] statesMenu) {
+
+		// Modify Customer Name //
+		io.println("Customer Name is currently "+orderToModify.getCustomerName()+".");
+		String customerName = io.readString("Write the new name, otherwise, just press enter to skip.:"); // 2
+		
+		if(!customerName.equals("")) {
+			orderToModify.setCustomerName(customerName);
+		}
+		
+		// Modify State Abbreviation //
+		io.println("State Abbreviation is currently "+orderToModify.getStateAbbrev()+".");
+		// View stateAbbrevs available
+		for(int i = 0; i<statesMenu[0].length; i++) {
+			io.println(statesMenu[0][i]+" : "+statesMenu[1][i]);
+		}
+		String stateAbbrev = io.readString("Please, enter the new state abbreviation, otherwise, just press enter to skip.: "); // 3
+		
+		if(!stateAbbrev.equals("")) {
+			orderToModify.setStateAbbrev(stateAbbrev);
+		}
+		
+		// Modify Product Type //
+		io.println("Product Type is currently "+orderToModify.getProductType()+".");
+		
+		Arrays.stream(productTypesMenu).forEach((p) -> {io.println(p);});// View productTypes available
+		String productType = io.readString("Please, enter new product type, otherwise, just press enter to skip.: "); // 5
+		
+		if(!productType.equals("")) {
+			orderToModify.setProductType(productType);
+		}
+		
+		// Modify Area //
+		io.println("Area is currently "+orderToModify.getArea()+".");
+		
+		BigDecimal area = io.readBigDecimal("Please insert a new area in ft^2, otherwise, just press enter to skip.: ",2,RoundingMode.HALF_UP); // 6
+		
+		orderToModify.setArea(area);
+		
 	}
 }

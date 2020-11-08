@@ -40,25 +40,67 @@ public class UserIOConsoleImpl implements UserIO {
 	
 	@Override
 	public int readInt(String prompt) {
-		print(prompt);
-		int ans = Integer.parseInt(scanner.nextLine());
-		println("");
-		return ans;
+		boolean hasError = false;
+		do {
+			try {
+				print(prompt);
+				int ans = Integer.parseInt(scanner.nextLine());
+				hasError = false;
+				println("");
+				return ans;
+			}catch(Exception e) {
+				println("Please enter an integer.");
+				hasError = true;
+			}
+		}while(hasError);
+		return 0;
 	}
 	
 	@Override
 	public BigDecimal readBigDecimal(String prompt, int decimals, RoundingMode roundingMode) {
-		print(prompt);
-		BigDecimal ans = new BigDecimal(scanner.nextLine());
-		ans.setScale(decimals, roundingMode);
-		println("");
-		return ans;
+		boolean hasError = false;
+		do {
+			try {
+				print(prompt);
+				BigDecimal ans = new BigDecimal(scanner.nextLine());
+				ans.setScale(decimals, roundingMode);
+				hasError = false;
+				println("");
+				return ans;
+			}catch(Exception e) {
+				println("Please enter a number.");
+				hasError = true;
+			}
+		}while(hasError);
+		return BigDecimal.ZERO;
 	}
 	
 	@Override
 	public LocalDate readLocalDate(String prompt, DateTimeFormatter format) {
+		boolean hasError = false;
+		do {
+			try {
+				print(prompt);
+				LocalDate ans = LocalDate.parse(scanner.nextLine(), format);
+				hasError = false;
+				println("");
+				return ans;
+			}catch(Exception e) {
+				println("Please enter a valid pattern.");
+				hasError = true;
+			}
+		}while(hasError);
+		return LocalDate.now();
+	}
+	
+	@Override
+	public boolean readBoolean(String prompt, String trueString) {
 		print(prompt);
-		LocalDate ans = LocalDate.parse(scanner.nextLine(), format);
-		return ans;
+		String ans = scanner.nextLine();
+		println("");
+		if(ans.equals(trueString)) {
+			return true;
+		}
+		return false;
 	}
 }

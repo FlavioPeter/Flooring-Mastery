@@ -5,6 +5,7 @@ package fm.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.OptionalInt;
 
 /**
  * @author Flavio Silva
@@ -28,6 +29,10 @@ public class Order {
 	LocalDate orderDate;
 	
 	public Order(int orderNumber) { // 1
+		this.orderNumber = orderNumber;
+	}
+	
+	public void setOrderNumber(int orderNumber) {
 		this.orderNumber = orderNumber;
 	}
 	

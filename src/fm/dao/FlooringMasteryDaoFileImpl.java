@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,15 +91,54 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 		writeOrder(orders, orderFileName);
 		return removedOrder;
 	}
+	
 	@Override
-	public List<Order> exportAllOrders() throws FlooringMasteryPersistenceException{
+	public void exportAllOrders() throws FlooringMasteryPersistenceException, IOException{
+		
+		PrintWriter out;
+		
+		File backup = new File("FileData/Backup/DataExport.txt");
+		
+		try {
+			out = new PrintWriter(new FileWriter(backup.getPath()));
+		}catch(IOException e) {
+			throw new FlooringMasteryPersistenceException("Could not persist data export information.", e);
+		}
+		
+		backup.createNewFile();
+		
+		out.println("OrderNumber::CustomerName::State::TaxRate::ProductType::Area::CostPerSquareFoot::LaborCostPerSquareFoot::MaterialCost::LaborCost::Tax::Total::Date");
+		
 		File direct = new File("FileData/Orders/");
 		
 		File[] fileArr = direct.listFiles();
 		
 		for(File file : fileArr) {
-			loadOrder(file.getPath());
+			
+			Scanner scanner;
+			
+			try {
+				scanner = new Scanner(new BufferedReader(new FileReader(file.getPath())));
+			}catch(FileNotFoundException e) {
+				throw new FlooringMasteryPersistenceException("-_- Could not load order data into memory.",e);
+			}
+			
+			String currentLine;
+			
+			currentLine = scanner.nextLine();//get rid of the header, maybe use it later for displayList
+			
+			while(scanner.hasNextLine()) {
+				
+				currentLine = scanner.nextLine();
+				
+				out.println(currentLine);
+			}
+			scanner.close();
+			
 		}
+		
+		out.flush();
+		out.close();
 	}
 	
 	private Order unmarshallOrder(String orderAsText) {
@@ -133,7 +173,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 		
 		orderFromFile.setTotal(new BigDecimal(orderTokens[11]));//[11]
 		
-		orderFromFile.setOrderDate(LocalDate.parse(orderTokens[12]));//[12]
+		orderFromFile.setOrderDate(LocalDate.parse(orderTokens[12], DateTimeFormatter.ofPattern("MM-dd-yyyy")));//[12]
 		
 		return orderFromFile;
 	}
@@ -304,7 +344,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 		
 		orderAsText += aOrder.getTotal()+DELIMITER;//11
 		
-		orderAsText += aOrder.getOrderDate();//12
+		orderAsText += aOrder.getOrderDate().format(DateTimeFormatter.ofPattern("MM-dd-yyyy"));//12
 		
 		return orderAsText;
 	}

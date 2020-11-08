@@ -49,6 +49,6 @@ public interface FlooringMasteryDao {
 	 */
 	Order removeOrder(int orderNumber, LocalDate orderDate) throws FlooringMasteryPersistenceException, IOException;
 
-	List<Order> exportAllOrders();	
+	void exportAllOrders() throws FlooringMasteryPersistenceException, IOException;	
 	
 }

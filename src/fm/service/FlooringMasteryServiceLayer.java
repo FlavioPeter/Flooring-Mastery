@@ -34,4 +34,10 @@ public interface FlooringMasteryServiceLayer {
 	
 	String[][] getStates() throws FlooringMasteryPersistenceException;
 	
+	void exportAllOrders() throws FlooringMasteryPersistenceException, IOException;
+
+	void changeOrderData(Order orderToModify) throws FlooringMasteryDataValidationException, FlooringMasteryPersistenceException;
+
+	Order addOrder(Order order) throws FlooringMasteryPersistenceException, IOException;
+	
 }

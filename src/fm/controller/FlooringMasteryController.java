@@ -33,7 +33,7 @@ public class FlooringMasteryController {
 		this.view = view;
 	}
 	
-	public void run() {
+	public void run(){
 		boolean keepGoing = true;
 		int menuSelection = 0;
 		
@@ -53,12 +53,15 @@ public class FlooringMasteryController {
 						createNewOrder(); // add pick a date functionality and make sure it unmarshalls and marshalls that date
 						break;
 					case 4:
-						removeOrder(); // add pick a date functionality and make sure it unmarshalls and marshalls that date
+						modifyOrder(); // add pick a date functionality and make sure it unmarshalls and marshalls that date
 						break;
 					case 5:
-						exportAllData(); // Unmarshalls all order dates and marshalls to one file
+						removeOrder(); // add pick a date functionality and make sure it unmarshalls and marshalls that date
 						break;
 					case 6:
+						exportAllData(); // Unmarshalls all order dates and marshalls to one file
+						break;
+					case 7:
 						keepGoing = false;
 						break;
 					default:
@@ -66,10 +69,11 @@ public class FlooringMasteryController {
 				}
 			}
 			exitMessage();
-		}catch(FlooringMasteryPersistenceException | IOException e) {
+		}catch(FlooringMasteryPersistenceException | FlooringMasteryDataValidationException | IOException e) {
 			view.displayErrorMessage(e.getMessage());
 		}
 	}
+
 
 	private int getMenuSelection() {
 		return view.printMenuAndGetSelection();
@@ -90,6 +94,27 @@ public class FlooringMasteryController {
 				view.displayErrorMessage(e.getMessage());
 			}
 		}while(hasErrors);
+	}
+	
+	private void modifyOrder() throws FlooringMasteryPersistenceException, IOException, FlooringMasteryDataValidationException {// 4
+		view.displayModifyOrderBanner();
+		LocalDate orderDate = view.getDateSpecification();
+		int orderNumber = view.getOrderNumberChoice();
+		
+		Order orderToModify = service.getOrder(orderNumber, orderDate);
+		
+		String[] productTypesMenu = service.getProductTypes();
+		String[][] statesMenu = service.getStates();
+		view.getModifiedOrderInfo(orderToModify, productTypesMenu, statesMenu);
+		
+		service.changeOrderData(orderToModify);
+		
+		if(view.updateData()) {
+			service.addOrder(orderToModify);
+		}else {
+			view.notUpdateDataMessage();
+		}
+		
 	}
 	
 	private void listOrders() throws FlooringMasteryPersistenceException {
@@ -115,9 +140,9 @@ public class FlooringMasteryController {
 		view.displayRemoveResult(removedOrder);
 	}
 	
-	private void exportAllData() {
+	private void exportAllData() throws FlooringMasteryPersistenceException, IOException {
 		view.displayExportAllDataBanner();
-		service.exportAllData();
+		service.exportAllOrders();
 		view.displayExportSuccess();
 		
 	}
