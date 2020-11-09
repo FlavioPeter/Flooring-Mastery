@@ -17,10 +17,11 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Flavio Silva/.p2/pool/plugins/org.junit.jupiter.api_5.6.0.v20200203-2009.jar">
+	<classpathentry kind="lib" path="C:/Users/Flavio Silva/.p2/pool/plugins/org.junit.jupiter.api_5.6.0.v20200203-2009.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="http://junit.org/junit5/docs/current/api/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

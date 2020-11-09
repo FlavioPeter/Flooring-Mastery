@@ -155,7 +155,7 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 				|| order.getProductType() == null
 				|| order.getArea() == null) {
 			
-			throw new FlooringMasteryDataValidationException("ERROR: All fiels are required. They must not be null");
+			throw new FlooringMasteryDataValidationException("ERROR: All fields are required. They must not be null");
 		}
 		
 		// Checking for valid date
@@ -164,9 +164,9 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 		}
 		
 		// Checking for valid characters
-		boolean checkInvalidChars = Pattern.compile("[^a-z0-9,]", Pattern.CASE_INSENSITIVE).matcher(order.getCustomerName()).find();
+		boolean checkInvalidChars = Pattern.compile("[^a-z0-9, ]", Pattern.CASE_INSENSITIVE).matcher(order.getCustomerName()).find();
 		if(checkInvalidChars) {
-			throw new FlooringMasteryDataValidationException("ERROR: The Customere Name contains other characters than a-z, A-Z and 0-9 .");
+			throw new FlooringMasteryDataValidationException("ERROR: The Customer Name contains other characters than a-z, A-Z and 0-9.");
 		}
 		
 		// Checking for valid state abbreviation
