@@ -58,9 +58,9 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 	}
 
 	private void setStateTaxAndProductTypeCost(Order order) throws FlooringMasteryPersistenceException {
-		BigDecimal taxRate = getAllTaxes().stream().filter((t) -> t.getStateAbbreviation().equals(order.getStateAbbrev())).map((t) -> t.getTaxRate()).reduce(BigDecimal.ZERO.setScale(2), BigDecimal::add);
-		BigDecimal costPerSquareFoot = getAllProducts().stream().filter((p) -> p.getProductType().equals(order.getProductType())).map((p) -> p.getCostPerSquareFoot()).reduce(BigDecimal.ZERO.setScale(2), BigDecimal::add);
-		BigDecimal laborCostPerSquareFoot = getAllProducts().stream().filter((p) -> p.getProductType().equals(order.getProductType())).map((p) -> p.getLaborCostPerSquareFoot()).reduce(BigDecimal.ZERO.setScale(2), BigDecimal::add);
+		BigDecimal taxRate = getAllTaxes().stream().filter((t) -> t.getStateAbbreviation().equalsIgnoreCase(order.getStateAbbrev())).map((t) -> t.getTaxRate()).reduce(BigDecimal.ZERO.setScale(2), BigDecimal::add);
+		BigDecimal costPerSquareFoot = getAllProducts().stream().filter((p) -> p.getProductType().equalsIgnoreCase(order.getProductType())).map((p) -> p.getCostPerSquareFoot()).reduce(BigDecimal.ZERO.setScale(2), BigDecimal::add);
+		BigDecimal laborCostPerSquareFoot = getAllProducts().stream().filter((p) -> p.getProductType().equalsIgnoreCase(order.getProductType())).map((p) -> p.getLaborCostPerSquareFoot()).reduce(BigDecimal.ZERO.setScale(2), BigDecimal::add);
 		
 		order.setTaxRate(taxRate.setScale(2,RoundingMode.HALF_UP));
 		order.setCostPerSquareFoot(costPerSquareFoot.setScale(2,RoundingMode.HALF_UP));
@@ -146,7 +146,8 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 		
 	}
 	
-	private void validateOrderData(Order order) throws FlooringMasteryDataValidationException, FlooringMasteryPersistenceException {
+	@Override
+	public void validateOrderData(Order order) throws FlooringMasteryDataValidationException, FlooringMasteryPersistenceException {
 		
 		// Checking that no values entered are null
 		if(order.getCustomerName() == null

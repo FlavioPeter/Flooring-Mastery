@@ -39,5 +39,7 @@ public interface FlooringMasteryServiceLayer {
 	void changeOrderData(Order orderToModify) throws FlooringMasteryDataValidationException, FlooringMasteryPersistenceException;
 
 	Order addOrder(Order order) throws FlooringMasteryPersistenceException, IOException;
+
+	void validateOrderData(Order order) throws FlooringMasteryDataValidationException, FlooringMasteryPersistenceException;
 	
 }

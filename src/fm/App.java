@@ -16,7 +16,7 @@ public class App {
 	/**
 	 * @param args
 	 */
-public static void main(String[] args) {
+	public static void main(String[] args) {
 		/*
 		UserIO myIo = new UserIOConsoleImpl();
 		FlooringMasteryView myView = new FlooringMasteryView(myIo);
@@ -26,6 +26,7 @@ public static void main(String[] args) {
 		controller.run();
 		*/
 		
+		// Spring DI
 		AnnotationConfigApplicationContext appContext = new AnnotationConfigApplicationContext();
 		appContext.scan("fm");
 		appContext.refresh();
